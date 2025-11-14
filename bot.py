@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ConversationHandler, InlineQueryHandler
 import config
 from reminders import create_reminder, get_user_reminders, delete_reminder, delete_all_user_reminders, calculate_time_from_text
 from keyboards import get_main_keyboard, get_quick_time_keyboard, get_cancel_keyboard, remove_keyboard, get_reminder_actions_keyboard
