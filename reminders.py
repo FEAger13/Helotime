@@ -1,7 +1,7 @@
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.date import DateTrigger
 from telegram import Bot
-from database import session, Reminder
+from database import SessionLocal, Reminder
 import config
 from datetime import datetime, timedelta
 import logging
@@ -14,7 +14,7 @@ scheduler = BackgroundScheduler()
 
 def send_reminder(reminder_id):
     """Функция для отправки напоминания"""
-    db_session = session()
+    db_session = SessionLocal()
     try:
         reminder = db_session.query(Reminder).filter_by(id=reminder_id).first()
         
@@ -49,7 +49,7 @@ def schedule_reminder(reminder_id, reminder_time):
 
 def create_reminder(user_id, chat_id, text, time):
     """Создает новое напоминание"""
-    db_session = session()
+    db_session = SessionLocal()
     try:
         reminder = Reminder(
             user_id=user_id,
@@ -71,19 +71,22 @@ def create_reminder(user_id, chat_id, text, time):
 
 def get_user_reminders(user_id):
     """Получает все напоминания пользователя"""
-    db_session = session()
+    db_session = SessionLocal()
     try:
         reminders = db_session.query(Reminder).filter_by(
             user_id=user_id, 
             is_sent=False
         ).order_by(Reminder.reminder_time.asc()).all()
         return reminders
+    except Exception as e:
+        logger.error(f"Ошибка при получении напоминаний: {e}")
+        return []
     finally:
         db_session.close()
 
 def delete_reminder(reminder_id):
     """Удаляет напоминание"""
-    db_session = session()
+    db_session = SessionLocal()
     try:
         reminder = db_session.query(Reminder).filter_by(id=reminder_id).first()
         if reminder:
@@ -107,7 +110,7 @@ def delete_reminder(reminder_id):
 
 def delete_all_user_reminders(user_id):
     """Удаляет все напоминания пользователя"""
-    db_session = session()
+    db_session = SessionLocal()
     try:
         reminders = db_session.query(Reminder).filter_by(user_id=user_id).all()
         count = len(reminders)
@@ -146,7 +149,6 @@ def calculate_time_from_text(time_text):
 
 def load_unsent_reminders():
     """Загружает все неотправленные напоминания при запуске бота"""
-    from database import SessionLocal
     db_session = SessionLocal()
     try:
         unsent_reminders = db_session.query(Reminder).filter_by(is_sent=False).all()
