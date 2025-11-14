@@ -388,14 +388,8 @@ def main():
     # Настраиваем обработчики
     setup_handlers(application)
     
-    # Запускаем бота
-    if config.WEBHOOK_URL:
-        # Для Render с webhook
-        from app import setup_webhook
-        setup_webhook(application)
-    else:
-        # Для локальной разработки с polling
-        application.run_polling()
+    # Запускаем бота с polling
+    application.run_polling()
 
 if __name__ == "__main__":
     main()
