@@ -146,7 +146,8 @@ def calculate_time_from_text(time_text):
 
 def load_unsent_reminders():
     """Загружает все неотправленные напоминания при запуске бота"""
-    db_session = session()
+    from database import SessionLocal
+    db_session = SessionLocal()
     try:
         unsent_reminders = db_session.query(Reminder).filter_by(is_sent=False).all()
         for reminder in unsent_reminders:
@@ -159,6 +160,7 @@ def load_unsent_reminders():
         db_session.commit()
     except Exception as e:
         logger.error(f"Ошибка при загрузке напоминаний: {e}")
+        db_session.rollback()
     finally:
         db_session.close()
 
