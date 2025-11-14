@@ -19,5 +19,11 @@ class Reminder(Base):
 engine = create_engine(config.DATABASE_URL)
 Base.metadata.create_all(engine)
 
-Session = sessionmaker(bind=engine)
-session = Session()
+SessionLocal = sessionmaker(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
