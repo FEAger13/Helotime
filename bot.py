@@ -331,6 +331,15 @@ async def cancel(update: Update, context):
     context.user_data.clear()
     return ConversationHandler.END
 
+async def quick_time_handler(update: Update, context):
+    """Обработка быстрого выбора времени"""
+    context.user_data['quick_time'] = update.message.text
+    await update.message.reply_text(
+        "📝 Введите текст напоминания:",
+        reply_markup=get_cancel_keyboard()
+    )
+    return WAITING_TEXT
+
 def setup_handlers(application):
     """Настройка обработчиков"""
     
@@ -365,21 +374,12 @@ def setup_handlers(application):
     # Обработка быстрого выбора времени
     application.add_handler(MessageHandler(
         filters.Regex('^(⏱ Через 1 час|⏱ Через 3 часа|🌅 Завтра утром|🌆 Сегодня вечером)$'),
-        lambda update, context: quick_time_handler(update, context)
+        quick_time_handler
     ))
     
     # Обработка неизвестных команд и текста
     application.add_handler(MessageHandler(filters.COMMAND, handle_unknown_command))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_text))
-
-async def quick_time_handler(update: Update, context):
-    """Обработка быстрого выбора времени"""
-    context.user_data['quick_time'] = update.message.text
-    await update.message.reply_text(
-        "📝 Введите текст напоминания:",
-        reply_markup=get_cancel_keyboard()
-    )
-    return WAITING_TEXT
 
 def main():
     """Основная функция"""
